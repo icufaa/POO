@@ -1,18 +1,14 @@
-def opcion_1():
+def funcion1():
     print("Has seleccionado la opción 1.")
-    # Aquí colocarías el código correspondiente a la opción 1
 
-def opcion_2():
+def funcion2():
     print("Has seleccionado la opción 2.")
-    # Aquí colocarías el código correspondiente a la opción 2
 
-def opcion_3():
+def funcion3():
     print("Has seleccionado la opción 3.")
-    # Aquí colocarías el código correspondiente a la opción 3
 
 def salir():
     print("Saliendo del programa.")
-    # Aquí podrías agregar código de limpieza o cualquier otra acción antes de salir
     exit()
 
 def menu():
@@ -24,15 +20,15 @@ def menu():
         opcion = input("Selecciona una opción: ")
         
         if opcion == "1":
-            opcion_1()
+            funcion1()
         elif opcion == "2":
-            opcion_2()
+            funcion2()
         elif opcion == "3":
-            opcion_3()
+            funcion3()
         elif opcion == "4":
             salir()
         else:
             print("Opción inválida. Inténtalo de nuevo.")
 
-# Para ejecutar el menú, simplemente llamas a la función menu():
+
 menu()
