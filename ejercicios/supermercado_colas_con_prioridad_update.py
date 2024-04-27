@@ -1,21 +1,4 @@
-"""
-1-las colas de caja son de la siguiente manera:
-CAJA prioridad embarazadas y ancianos
-CAJA discapacitados
-CAJA normal
-
-2- Cuando ingresa una persona se debe indicar si la condicion especial (Embarazada- Anciano - discapacitado - normal)
-
-3- Los carritos se entregan e usan prioridad, primero embarazadas, segundo ancianos, tercero discapacitado y por ultimo normal
-
-4 - de acuerdo a su condicion van a la cola correspondiente
-
-5- Si las colas especiales estan vacias, una normal puede ir a cualquiera de ellas
-
-6- La salida de pantalla es con emoticonos
-
-"""
-
+import random
 
 class Nodo:
     def __init__(self, dato):
@@ -26,17 +9,19 @@ class Nodo:
 class Cliente:
     def __init__(self, emoji):
         self.emoji = emoji
+    
+    @staticmethod
+    def poner_emoji(emoji):
+        return Cliente(emoji)
+
 
 class Carrito:
     def __init__(self):
         self.contador = 6
 
-
     def mostrar_estado(self):
         if 0 < self.contador <= 6:
             print(f"Carritos disponibles: {self.contador}")
-        else:
-            print("No hay carritos disponibles")
 
 class ColaEspera:
     def __init__(self):
@@ -60,7 +45,7 @@ class ColaEspera:
             print("La cola de espera está vacía.")
 
 class ColaCaja:
-    def __init__(self,caja = int):
+    def __init__(self, caja=int):
         self.clientes = []
         self.caja = caja
     
@@ -80,34 +65,85 @@ class ColaCaja:
             print(lista_caja)
         else:
             print(f"La Caja {self.caja} esta vacia")
-        
 
+flag_cliente = None
+
+def control_cliente_que_entra(nuevo_cliente):
+    global flag_cliente
+    if nuevo_cliente.emoji not in['👵',"♿","🤰🏻"]:
+        flag_cliente = nuevo_cliente.emoji
+    elif nuevo_cliente.emoji not in ["🧍","🤰🏻",'👵']:
+        flag_cliente = nuevo_cliente.emoji
+    elif nuevo_cliente.emoji not in ["🧍","🤰🏻",'♿']:
+        flag_cliente = nuevo_cliente.emoji
+    elif nuevo_cliente.emoji not in ['👵',"♿","🧍"]:
+        flag_cliente = nuevo_cliente.emoji
+    
 
 
 def mover_clientes_a_cajas():
-    if len(caja_normales.clientes) <= len(caja_discapacitados.clientes) and len(caja_normales.clientes) <= len(caja_ancianos_embarazadas.clientes) and 0 < carritos.contador <=6:
-        caja_normales.agregar_cliente(nuevo_cliente)
-        carritos.contador -=1
-        carritos.mostrar_estado()
-        caja_normales.mostrar_estado()
+    global flag_cliente
+    nuevo_cliente = Cliente.poner_emoji(random.choice(["👵", "♿", "🤰🏻", "🧍"]))
+    control_cliente_que_entra(nuevo_cliente)
 
-    elif len(caja_ancianos_embarazadas.clientes) < len(caja_normales.clientes)and len(caja_ancianos_embarazadas.clientes) <= len(caja_discapacitados.clientes) and 0 < carritos.contador<=6:
-        caja_ancianos_embarazadas.agregar_cliente(nuevo_cliente)
-        carritos.contador -= 1
-        carritos.mostrar_estado()
-        caja_ancianos_embarazadas.mostrar_estado()
-        
-    elif len(caja_discapacitados.clientes) < len(caja_ancianos_embarazadas.clientes) and 0 < carritos.contador<=6:
-        caja_discapacitados.agregar_cliente(nuevo_cliente)
-        carritos.contador -= 1
-        carritos.mostrar_estado()
-        caja_discapacitados.mostrar_estado()
 
-    else:
-        cliente_espera.agregar_cliente(nuevo_cliente)
+    def mover_final():
+        if len(caja_normales.clientes) <= len(caja_discapacitados.clientes) and len(caja_normales.clientes) <= len(caja_ancianos_embarazadas.clientes) and 0 < carritos.contador <= 6 or len(caja_normales.clientes) == 0 or len(caja_ancianos_embarazadas.clientes) == 0 or len(caja_discapacitados.clientes) == 0:
+            caja_normales.agregar_cliente(nuevo_cliente)
+            carritos.contador -=1
+            carritos.mostrar_estado()
+            caja_normales.mostrar_estado()
+            
 
-    if carritos.contador==0:
-        print("No hay carritos disponibles")
+        elif len(caja_ancianos_embarazadas.clientes) < len(caja_normales.clientes)and len(caja_ancianos_embarazadas.clientes) <= len(caja_discapacitados.clientes) and 0 < carritos.contador<=6 or len(caja_normales.clientes) == 0 or len(caja_ancianos_embarazadas.clientes) == 0 or len(caja_discapacitados.clientes) == 0:
+            caja_ancianos_embarazadas.agregar_cliente(nuevo_cliente)
+            carritos.contador -= 1
+            carritos.mostrar_estado()
+            caja_ancianos_embarazadas.mostrar_estado()
+            
+        elif len(caja_discapacitados.clientes) < len(caja_ancianos_embarazadas.clientes) and 0 < carritos.contador<=6 or len(caja_normales.clientes) == 0 or len(caja_ancianos_embarazadas.clientes) == 0 or len(caja_discapacitados.clientes) == 0:
+            caja_discapacitados.agregar_cliente(nuevo_cliente)
+            carritos.contador -= 1
+            carritos.mostrar_estado()
+            caja_discapacitados.mostrar_estado()
+
+        else:
+            cliente_espera.agregar_cliente(nuevo_cliente)
+
+    
+    if flag_cliente =="🧍" and flag_cliente:
+        mover_final()
+    elif flag_cliente == "🤰🏻":
+        if carritos.contador> 0:
+            caja_ancianos_embarazadas.agregar_cliente(nuevo_cliente)
+            carritos.contador -=1
+            carritos.mostrar_estado()
+            caja_ancianos_embarazadas.mostrar_estado()
+        else:
+            mover_final()
+    elif flag_cliente == "♿":
+        if carritos.contador>0:
+            caja_discapacitados.agregar_cliente(nuevo_cliente)
+            carritos.contador -=1
+            carritos.mostrar_estado()
+            caja_discapacitados.mostrar_estado()
+        else:
+            mover_final()
+    elif flag_cliente == "👵":
+        if carritos.contador>0:
+            caja_ancianos_embarazadas.agregar_cliente(nuevo_cliente)
+            carritos.contador -=1
+            carritos.mostrar_estado()
+            caja_ancianos_embarazadas.mostrar_estado()
+        else:
+            mover_final()
+
+
+
+
+
+
+
 
 def control_fila_carrito():
     if carritos.contador > 0:
@@ -124,9 +160,11 @@ def control_fila_carrito():
                 caja_discapacitados.agregar_cliente(cliente_espera.siguiente_cliente())
             
             carritos.contador -= 1
-        carritos.mostrar_estado()
-    else:
-        print("No hay carritos disponibles")
+    elif carritos.contador == 0:
+        print("No hay carritos disponibles, pasa a cola de espera")
+
+
+
 
 cliente_espera = ColaEspera()
 caja_ancianos_embarazadas = ColaCaja("Anciandos y Embarazadas")
@@ -137,18 +175,14 @@ carritos = Carrito()
 def menu():
     print("""
 Opciones
----------------
+-----------------------------------
 [1]-Ingresa Cliente
 [2]-Cobrar Caja Embarazadas-Viejas
 [3]-Cobrar Caja Discapacitados
 [4]-Cobrar Caja Normales
 [5]-Ver Estado de Cajas
-[6]-
-[7]-
----------------
+-----------------------------------
 """)
-
-
 
 
 while True:
@@ -156,18 +190,23 @@ while True:
     opcion = int(input("Ingrese una opcion: "))
 
     if opcion == 1:
-        nuevo_cliente = Cliente("🧍🏻")
+        if carritos.contador == 0:
+            print("No hay carritos disponible, pasa a cola de espera")
         mover_clientes_a_cajas()
+        
     if opcion == 2:
         caja_ancianos_embarazadas.siguiente_cliente()
+        print("Se ha cobrado En Caja Ancianos/Embarazadas, Pasa el siguiente")
         carritos.contador+=1
         control_fila_carrito()
     if opcion == 3:
         caja_discapacitados.siguiente_cliente()
+        print("Se ha cobrado En Caja Discapacitados, Pasa el siguiente")
         carritos.contador+=1
         control_fila_carrito()
     if opcion ==4:
         caja_normales.siguiente_cliente()
+        print("Se ha cobrado En Caja Normales, Pasa el siguiente")
         carritos.contador+=1
         control_fila_carrito()
     elif opcion == 5:
@@ -184,6 +223,3 @@ while True:
         print("------------------------")
     else:
         input("Presione una tecla para continuar...")
-        
-
-
