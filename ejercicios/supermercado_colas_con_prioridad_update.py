@@ -140,11 +140,6 @@ def mover_clientes_a_cajas():
 
 
 
-
-
-
-
-
 def control_fila_carrito():
     if carritos.contador > 0:
         if cliente_espera.clientes:
