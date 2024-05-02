@@ -74,7 +74,7 @@ class Pila:
     def sacardePila(self):
         localcount = 0
         actual = self.base
-        while localcount < self.count - 3:
+        while localcount < self.count - 1:
             actual = actual.next
             localcount += 1
         viejoTope = actual
