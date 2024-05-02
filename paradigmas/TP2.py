@@ -4,12 +4,13 @@ import os
 
 seguimientoCarritos = []
 carritosDisponibles = 6
+id_carrito = 1
 
 diccionarioCondiciones = {
         1 : "NORMAL",
-        2 : "DISCAPACITADO",
+        2 : "DISCAPACITADO/A",
         3 : "EMBARAZADA",
-        4 :  "ANCIANO",
+        4 :  "ANCIANO/A",
         }
 
 lista_clientes = [
@@ -21,13 +22,14 @@ lista_clientes = [
 ]
 
 class Carrito():
-    def __init__(self) -> None:
+    def __init__(self):
+        global id_carrito
         self.propietario = None
         self.cola = None
-        self.id = 10
+        self.id = id_carrito
+        id_carrito += 1
     
     
-
 class Persona():
     def __init__(self, condicion):
         self.condicion = condicion
@@ -138,16 +140,21 @@ def displayEstadoGeneral():
         carritosDisponiblesString += "\U0001f6d2 "
     print(carritosDisponiblesString + "\t" + pilaCarritosString)
 
-    filaCajaNormalString = "\n[CAJA N]\t"
-    filaCajaDiscapString = "\n[CAJA D]\t"
-    filacajaEmbAncString = "\n[CAJA E/A]\t"
+    filaCajaNormalString = "\n[CAJA NORMAL]\t"
+    filaCajaDiscapString = "\n[CAJA DISCAPACITADOS]\t"
+    filacajaEmbAncString = "\n[CAJA EMBARAZADAS/ABUELAS]\t"
 
-    for i in range(filaCajaNormal.size()):
-        filaCajaNormalString += filaCajaNormal.retornarElemento(i).representacion
-    for i in range(filaCajaDiscap.size()):
-        filaCajaDiscapString += filaCajaDiscap.retornarElemento(i).representacion
-    for i in range(filaCajaEmbAnc.size()):
-        filacajaEmbAncString += filaCajaEmbAnc.retornarElemento(i).representacion
+    def obtener_nombre_caja(cola):
+        if cola.isEmpty():
+            return "Sin cliente en la caja"
+        else:
+            cliente_en_caja = cola.retornarElemento(0)
+            condicion = diccionarioCondiciones[cliente_en_caja.condicion]
+            return f"Cliente en la caja: {cliente_en_caja.nombre} ({condicion})"
+    
+    filaCajaNormalString += obtener_nombre_caja(filaCajaNormal)
+    filaCajaDiscapString += obtener_nombre_caja(filaCajaDiscap)
+    filacajaEmbAncString += obtener_nombre_caja(filaCajaEmbAnc)
 
     print(filaCajaNormalString, end="->")
     print(filaCajaDiscapString, end="->")
@@ -157,8 +164,10 @@ def displayCarritos():
     for i in range(len(seguimientoCarritos)):
         carritoActual = seguimientoCarritos[i]
         propietario = carritoActual.propietario
-        id = 20
-        print(f"Estado de carrito {id}\nPropietario = El {diccionarioCondiciones[propietario.condicion]} {propietario.nombre}")
+        carrito_id = carritoActual.id
+        print(f"Estado de carrito {carrito_id}\nPropietario = {diccionarioCondiciones[propietario.condicion]} {propietario.nombre}" if propietario is not None else f"Estado de carrito {carrito_id}\nPropietario = Sin propietario")
+
+
         
 
 
@@ -199,43 +208,27 @@ def atenderEnCaja(filaACobrar):
     global carritosDisponibles
     filaACobrar.sacarDeCola()
     carritosDisponibles += 1
-    if filaCarritos.isEmpty():
-        None
-    else:
-        # el primer for itera tal que solo las embarazadas puedan pasar primero
+    if not filaCarritos.isEmpty():
         for i in range(filaCarritos.count):
-            cliente = filaCarritos.sacarDeCola()
+            cliente = filaCarritos.retornarElemento(0)
+            filaCarritos.sacarDeCola()
             if cliente.condicion == 3:
                 prioridadColaCaja(cliente).agregarACola(cliente)
                 carritosDisponibles -= 1
                 return
-            else:
-                filaCarritos.agregarACola(cliente)
-        # el segundo for itera tal que solo los ancianos puedan pasar segundos
-        for i in range(filaCarritos.count):
-            cliente = filaCarritos.sacarDeCola()
-            if cliente.condicion == 4:
+            elif cliente.condicion == 4:
+                prioridadColaCaja(cliente).agregarACola(cliente)
+                carritosDisponibles -= 1
+                return
+            elif cliente.condicion == 2:
                 prioridadColaCaja(cliente).agregarACola(cliente)
                 carritosDisponibles -= 1
                 return
             else:
-                filaCarritos.agregarACola(cliente)
-        # el tercer for itera tal que solo los discapacitados puedan pasar terceros
-        for i in range(filaCarritos.count):
-            cliente = filaCarritos.sacarDeCola()
-            if cliente.condicion == 2:
-                cliente = filaCarritos.sacarDeCola()
                 prioridadColaCaja(cliente).agregarACola(cliente)
                 carritosDisponibles -= 1
                 return
-            else:
-                filaCarritos.agregarACola(cliente)
-        # entran los normales
-        cliente = filaCarritos.sacarDeCola()
-        prioridadColaCaja(cliente).agregarACola(cliente)
-        carritosDisponibles -= 1
-        return
-
+            
 # esta función activa la cobranza segun la fila
 def cobrarEnCaja():
     cajaNormalNoVacia = not filaCajaNormal.isEmpty()
@@ -265,12 +258,13 @@ def ingresoDeCliente():
         carritoAsignado = pilaCarritosDisponibles.sacardePila()
         carritoAsignado.propietario = cliente
         prioridadColaCaja(cliente).agregarACola(cliente)
+        carritosDisponibles -=1
     else:
         None
 
 def generarCarritos():
     for i in range(6):
-        nuevoCarrito = Carrito
+        nuevoCarrito = Carrito()
         pilaCarritosDisponibles.agregarAPila(nuevoCarrito)
         seguimientoCarritos.append(nuevoCarrito)
 
