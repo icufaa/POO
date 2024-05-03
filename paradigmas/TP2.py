@@ -1,17 +1,20 @@
-import random   
+# TRABAJO PRACTICO N2 -
+# MEYER IVÁN - VIÑALES FACUNDO
+
+import random
 import os
 
 
 seguimientoCarritos = []
-carritosDisponibles = 6
-id_carrito = 1
+carritosDisponibles = 0
+
 
 diccionarioCondiciones = {
-        1 : "NORMAL",
-        2 : "DISCAPACITADO/A",
-        3 : "EMBARAZADA",
-        4 :  "ANCIANO/A",
-        }
+    1: "NORMAL",
+    2: "DISCAPACITADO",
+    3: "EMBARAZADA",
+    4: "ANCIANO",
+}
 
 lista_clientes = [
     "Juan", "María", "Pedro", "Ana", "Luis", "Sofía", "Carlos", "Laura", "Miguel", "Isabel",
@@ -21,25 +24,26 @@ lista_clientes = [
     "Manuel", "Sara", "Ángel", "Cristina", "Ricardo", "Verónica", "Alberto", "Inés", "Guillermo", "Victoria"
 ]
 
+
 class Carrito():
-    def __init__(self):
-        global id_carrito
+    def __init__(self) -> None:
+        global carritosDisponibles
+        carritosDisponibles += 1
         self.propietario = None
         self.cola = None
-        self.id = id_carrito
-        id_carrito += 1
-    
-    
+        self.id = carritosDisponibles
+
+
 class Persona():
     def __init__(self, condicion):
         self.condicion = condicion
         self.representacion = diccionarioCondiciones[condicion][0]
         self.nombre = random.choice(lista_clientes)
-    
+
     @property
     def condicion(self):
         return self._condicion
-    
+
     @condicion.setter
     def condicion(self, value):
         if value in list(diccionarioCondiciones.keys()):
@@ -48,39 +52,48 @@ class Persona():
             raise ValueError("Condicion ingresada no válida")
 
 
-
 class Nodo:
     def __init__(self, data):
         self.data = data
         self.next = None
 
+
 class Pila:
     def __init__(self):
         self.tope = None
-        self.base = None
         self.count = 0
-    
+
     def agregarAPila(self, item):
         nodoitem = Nodo(item)
         if self.tope is None:
             self.tope = nodoitem
-            self.base = nodoitem
             self.count += 1
         else:
-            self.tope.next = nodoitem
+            nodoitem.next = self.tope
             self.tope = nodoitem
             self.count += 1
-    
+
     def sacardePila(self):
+        if self.tope is None:
+            return None
+        else:
+            viejoTope = self.tope.data
+            nuevoTope = self.tope.next
+            self.tope.next = None
+            self.tope = nuevoTope
+            self.count -= 1
+            return viejoTope
+
+    def estaEnPila(self, value):
         localcount = 0
-        actual = self.base
-        while localcount < self.count - 1:
+        actual = self.tope
+        while localcount < self.count:
+            if actual.data == value:
+                return True
             actual = actual.next
             localcount += 1
-        viejoTope = actual
-        self.tope = actual
-        self.count -= 1
-        return viejoTope.data
+        return False
+
 
 class Queue:
     def __init__(self):
@@ -123,53 +136,60 @@ class Queue:
 
     def isEmpty(self):
         return self.final is None and self.frente is None
- 
+
     def size(self):
         return self.count
+
 
 # funcion para mostrar gráficamente el estado de la tienda
 def displayEstadoGeneral():
     pilaCarritosString = str()
+    carritosDisponiblesString = "[CARRITOS]"
+    for i in range(pilaCarritosDisponibles.count):
+        carritosDisponiblesString += "\U0001f6d2 "
     try:
-        for i in range(filaCarritos.size()):
+        for i in range(filaCarritos.count):
             pilaCarritosString += filaCarritos.retornarElemento(i).representacion
     except:
         None
-    carritosDisponiblesString = "[CARRITOS]"
-    for i in range(carritosDisponibles):
-        carritosDisponiblesString += "\U0001f6d2 "
     print(carritosDisponiblesString + "\t" + pilaCarritosString)
 
-    filaCajaNormalString = "\n[CAJA NORMAL]\t"
-    filaCajaDiscapString = "\n[CAJA DISCAPACITADOS]\t"
-    filacajaEmbAncString = "\n[CAJA EMBARAZADAS/ABUELAS]\t"
+    filaCajaNormalString = "\n[CAJA N]\t"
+    filaCajaDiscapString = "\n[CAJA D]\t"
+    filacajaEmbAncString = "\n[CAJA E/A]\t"
 
-    def obtener_nombre_caja(cola):
-        if cola.isEmpty():
-            return "Sin cliente en la caja"
-        else:
-            cliente_en_caja = cola.retornarElemento(0)
-            condicion = diccionarioCondiciones[cliente_en_caja.condicion]
-            return f"Cliente en la caja: {cliente_en_caja.nombre} ({condicion})"
-    
-    filaCajaNormalString += obtener_nombre_caja(filaCajaNormal)
-    filaCajaDiscapString += obtener_nombre_caja(filaCajaDiscap)
-    filacajaEmbAncString += obtener_nombre_caja(filaCajaEmbAnc)
+    for i in range(filaCajaNormal.size()):
+        filaCajaNormalString += filaCajaNormal.retornarElemento(i).representacion + " - "
+    for i in range(filaCajaDiscap.size()):
+        filaCajaDiscapString += filaCajaDiscap.retornarElemento(i).representacion + " - "
+    for i in range(filaCajaEmbAnc.size()):
+        filacajaEmbAncString += filaCajaEmbAnc.retornarElemento(i).representacion + " - "
 
-    print(filaCajaNormalString, end="->")
-    print(filaCajaDiscapString, end="->")
-    print(filacajaEmbAncString, end="->")
+    print(filaCajaNormalString)
+    print(filaCajaDiscapString)
+    print(filacajaEmbAncString)
+
 
 def displayCarritos():
     for i in range(len(seguimientoCarritos)):
         carritoActual = seguimientoCarritos[i]
         propietario = carritoActual.propietario
-        carrito_id = carritoActual.id
-        print(f"Estado de carrito {carrito_id}\nPropietario = {diccionarioCondiciones[propietario.condicion]} {propietario.nombre}" if propietario is not None else f"Estado de carrito {carrito_id}\nPropietario = Sin propietario")
+        ubicacion = carritoActual.cola
 
+        if propietario == None:
+            ubicacion = "Pila de carritos"
+        if carritoActual.cola == filaCajaNormal:
+            ubicacion = "Fila de personas normales"
+        elif carritoActual.cola == filaCajaDiscap:
+            ubicacion = "Fila de personas discapacitadas"
+        elif carritoActual.cola == filaCajaEmbAnc:
+            ubicacion = "Fila de personas embarazadas / ancianas"
 
-        
-
+        try:
+            print(
+                f"Estado de carrito {carritoActual.id}\nPropietario = {propietario.nombre} ({diccionarioCondiciones[propietario.condicion].lower()})\nUbicacion = {ubicacion}\n")
+        except:
+            print(f"Estado de carrito {carritoActual.id}\nPropietario = Nadie\nUbicacion = {ubicacion}\n")
 
 # esta funcion determina a donde va a ir la persona de acuerdo a su condicion
 def prioridadColaCaja(clientearg):
@@ -203,50 +223,86 @@ def prioridadColaCaja(clientearg):
         return filaCajaEmbAnc
 
 
-# esta función realiza el proceso de cobranza
+# esta función realiza la atencion en caja y a su vez permite que entren nuevos clientes (de acuerdo a su condicion)
+# cuando se liberan carritos
 def atenderEnCaja(filaACobrar):
     global carritosDisponibles
-    filaACobrar.sacarDeCola()
-    carritosDisponibles += 1
-    if not filaCarritos.isEmpty():
+    cliente = filaACobrar.sacarDeCola()
+    carritoCliente = None
+
+    for i in range(len(seguimientoCarritos)):
+        if cliente == seguimientoCarritos[i].propietario:
+            carritoCliente = seguimientoCarritos[i]
+            break
+
+    carritoCliente.propietario = None
+    carritoCliente.cola = None
+    pilaCarritosDisponibles.agregarAPila(carritoCliente)
+    if filaCarritos.isEmpty():
+        None
+    else:
+        # una vez se libera un carrito, este pasa a ser propiedad de prioridad superior dentro de la cola de los carritos   z
+        # el primer for itera tal que solo las embarazadas puedan pasar primero
         for i in range(filaCarritos.count):
-            cliente = filaCarritos.retornarElemento(0)
-            filaCarritos.sacarDeCola()
+            cliente = filaCarritos.sacarDeCola()
             if cliente.condicion == 3:
+                carritoAsignado = pilaCarritosDisponibles.sacardePila()
+                carritoAsignado.propietario = cliente
                 prioridadColaCaja(cliente).agregarACola(cliente)
-                carritosDisponibles -= 1
-                return
-            elif cliente.condicion == 4:
-                prioridadColaCaja(cliente).agregarACola(cliente)
-                carritosDisponibles -= 1
-                return
-            elif cliente.condicion == 2:
-                prioridadColaCaja(cliente).agregarACola(cliente)
-                carritosDisponibles -= 1
                 return
             else:
+                filaCarritos.agregarACola(cliente)
+        # el segundo for itera tal que solo los ancianos puedan pasar segundos
+        for i in range(filaCarritos.count):
+            cliente = filaCarritos.sacarDeCola()
+            if cliente.condicion == 4:
+                carritoAsignado = pilaCarritosDisponibles.sacardePila()
+                carritoAsignado.propietario = cliente
                 prioridadColaCaja(cliente).agregarACola(cliente)
-                carritosDisponibles -= 1
                 return
-            
-# esta función activa la cobranza segun la fila
+            else:
+                filaCarritos.agregarACola(cliente)
+        # el tercer for itera tal que solo los discapacitados puedan pasar terceros
+        for i in range(filaCarritos.count):
+            cliente = filaCarritos.sacarDeCola()
+            if cliente.condicion == 2:
+                carritoAsignado = pilaCarritosDisponibles.sacardePila()
+                carritoAsignado.propietario = cliente
+                prioridadColaCaja(cliente).agregarACola(cliente)
+                return
+            else:
+                filaCarritos.agregarACola(cliente)
+
+        # entran los normales
+        cliente = filaCarritos.sacarDeCola()
+        carritoAsignado = pilaCarritosDisponibles.sacardePila()
+        carritoAsignado.propietario = cliente
+        prioridadColaCaja(cliente).agregarACola(cliente)
+        return
+
+
+# esta función se fija si hay gente en la cola esperando en cada una de las cajas, si se da el caso de que en una no hay gente,
+# no se realiza ningun proceso de cobranza
 def cobrarEnCaja():
     cajaNormalNoVacia = not filaCajaNormal.isEmpty()
-    cajaDisacpNoVacia = not filaCajaDiscap.isEmpty()
+    cajaDiscapNoVacia = not filaCajaDiscap.isEmpty()
     cajaEmbAncNoVacia = not filaCajaEmbAnc.isEmpty()
 
     if cajaNormalNoVacia:
         atenderEnCaja(filaCajaNormal)
-    if cajaDisacpNoVacia:
+    if cajaDiscapNoVacia:
         atenderEnCaja(filaCajaDiscap)
     if cajaEmbAncNoVacia:
         atenderEnCaja(filaCajaEmbAnc)
+
+
 
 # esta funcion se encarga del tipo de cliente que ingresa a la tienda
 def ingresoDeCliente():
     global carritosDisponibles
     while True:
-        condicionCliente = int(input("Ingrese la condición del cliente\n1) Normal\n2) Discapacitado\n3) Embarazada\n4) Anciano\nOpcion: "))
+        condicionCliente = int(
+            input("Ingrese la condición del cliente\n1) Normal\n2) Discapacitado\n3) Embarazada\n4) Anciano\nOpcion: "))
         try:
             cliente = Persona(condicionCliente)
             break
@@ -257,10 +313,9 @@ def ingresoDeCliente():
         cliente = filaCarritos.sacarDeCola()
         carritoAsignado = pilaCarritosDisponibles.sacardePila()
         carritoAsignado.propietario = cliente
+        carritoAsignado.cola = prioridadColaCaja(cliente)
         prioridadColaCaja(cliente).agregarACola(cliente)
-        carritosDisponibles -=1
-    else:
-        None
+
 
 def generarCarritos():
     for i in range(6):
@@ -268,11 +323,14 @@ def generarCarritos():
         pilaCarritosDisponibles.agregarAPila(nuevoCarrito)
         seguimientoCarritos.append(nuevoCarrito)
 
+
+
 filaCajaNormal = Queue()
 filaCajaDiscap = Queue()
 filaCajaEmbAnc = Queue()
 filaCarritos = Queue()
 pilaCarritosDisponibles = Pila()
+
 
 def menu():
     print("""
@@ -281,16 +339,17 @@ def menu():
     [1]- Ingresa Cliente
     [2]- Cobrar Caja
     [3]- Mostrar Estado de carritos
-    [4]-
 
     ---------------
     """)
 
+
 def clear():
-    if os.name =='posix':
+    if os.name == 'posix':
         _ = os.system('clear')
-    elif os.name =='nt':
+    elif os.name == 'nt':
         _ = os.system('cls')
+
 
 generarCarritos()
 
