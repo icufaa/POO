@@ -158,7 +158,6 @@ class Queue:
 
 # Función para mostrar gráficamente el estado de la tienda
 def displayEstadoGeneral():
-    
     pilaCarritosString = str()
     carritosDisponiblesString = "[CARRITOS]"
     for i in range(pilaCarritosDisponibles.count):
@@ -257,21 +256,45 @@ def atenderEnCaja(filaACobrar):
     if filaCarritos.isEmpty():
         None
     else:
-        prioridad = 4
-        while True: #Ordena la fila de los carritos tal que solo las personas con más prioridad agarren el carrito que primero se libere
+        # Una vez se libera un carrito, este pasa a ser propiedad de prioridad superior dentro de la cola de los carritos
+        # El primer bucle itera tal que solo las embarazadas puedan pasar primero
+        for i in range(filaCarritos.count):
+            cliente = filaCarritos.sacarDeCola()
+            if cliente.condicion == 3:
+                carritoAsignado = pilaCarritosDisponibles.sacardePila()
+                carritoAsignado.propietario = cliente
+                prioridadColaCaja(cliente).agregarACola(cliente)
+                return
+            else:
+                filaCarritos.agregarACola(cliente)
+        # El segundo bucle itera tal que solo los ancianos puedan pasar segundos
+        for i in range(filaCarritos.count):
+            cliente = filaCarritos.sacarDeCola()
+            if cliente.condicion == 4:
+                carritoAsignado = pilaCarritosDisponibles.sacardePila()
+                carritoAsignado.propietario = cliente
+                prioridadColaCaja(cliente).agregarACola(cliente)
+                return
+            else:
+                filaCarritos.agregarACola(cliente)
+        # El tercer bucle itera tal que solo los discapacitados puedan pasar terceros
+        for i in range(filaCarritos.count):
+            cliente = filaCarritos.sacarDeCola()
+            if cliente.condicion == 2:
+                carritoAsignado = pilaCarritosDisponibles.sacardePila()
+                carritoAsignado.propietario = cliente
+                prioridadColaCaja(cliente).agregarACola(cliente)
+                return
+            else:
+                filaCarritos.agregarACola(cliente)
 
-            try:
-                for i in range(filaCarritos.count):
-                    cliente = filaCarritos.sacarDeCola()
-                    if cliente.condicion == 4:
-                        carritoAsignado = pilaCarritosDisponibles.sacardePila()
-                        carritoAsignado.propietario = cliente
-                        prioridadColaCaja(cliente).agregarACola(cliente)
-                        return
-                prioridad -= 1
-                
-            except:
-                return 
+        # Entran los normales
+        cliente = filaCarritos.sacarDeCola()
+        carritoAsignado = pilaCarritosDisponibles.sacardePila()
+        carritoAsignado.propietario = cliente
+        prioridadColaCaja(cliente).agregarACola(cliente)
+        return
+
 
 # Funcion para verificar si hay gente en la cola esperando en cada una de las cajas
 def cobrarEnCaja():
@@ -299,13 +322,13 @@ def ingresoDeCliente():
         except ValueError:
             print("Ingrese una condición válida\n")
     if pilaCarritosDisponibles.count >= 1:
-        filaCarritos.count += 1
         carritoAsignado = pilaCarritosDisponibles.sacardePila()
         carritoAsignado.propietario = cliente
         carritoAsignado.cola = prioridadColaCaja(cliente)
         prioridadColaCaja(cliente).agregarACola(cliente)
     else:
-        filaCarritos.agregarACola(cliente)# Agrega al cliente a la fila de carritos
+        filaCarritos.agregarACola(cliente)  # Agrega al cliente a la fila de carritos
+
 
 
 # Función para generar los carritos disponibles inicialmente
@@ -350,7 +373,6 @@ generarCarritos()
 
 # Bucle principal del programa
 while True:
-    
     menu()  # Mostrar menú de opciones
     ans = int(input("Opcion: "))  # Leer la opción seleccionada por el usuario
     clear()  # Limpiar la consola
@@ -361,7 +383,6 @@ while True:
         print("\n")  # Imprimir línea en blanco
     elif ans == 2:
         cobrarEnCaja()  # Si la opción es 2, cobrar en la caja
-        clear()
         displayEstadoGeneral()  # Mostrar el estado general de la tienda
         print("\n")  # Imprimir línea en blanco
     elif ans == 3:
