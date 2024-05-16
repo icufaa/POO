@@ -1,4 +1,5 @@
 import csv
+import time
 
 class Nodo:
     def __init__(self, dato):
@@ -73,13 +74,25 @@ def menu():
         
         if opcion == "1":
             print("Recorrido Inorden:")
+            inicio= time.time()
             arbol.inorden(arbol.raiz)
+            fin = time.time()
+            tiempo_total = fin - inicio
+            print(f"\nTiempo que tardo en ejecutar el recorrido: {tiempo_total}")
         elif opcion == "2":
             print("\nRecorrido Preorden:")
+            inicio= time.time()
             arbol.preorden(arbol.raiz)
+            fin = time.time()
+            tiempo_total = fin - inicio
+            print(f"\nTiempo que tardo en ejecutar el recorrido: {tiempo_total}")
         elif opcion == "3":
             print("\nRecorrido Postorden:")
+            inicio= time.time()
             arbol.postorden(arbol.raiz)
+            fin = time.time()
+            tiempo_total = fin - inicio
+            print(f"\nTiempo que tardo en ejecutar el recorrido: {tiempo_total}")
         elif opcion == "4":
             salir()
         else:
