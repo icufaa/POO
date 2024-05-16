@@ -97,3 +97,5 @@ def menu():
             salir()
         else:
             print("Opción inválida. Inténtalo de nuevo.")
+
+menu()
