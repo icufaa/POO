@@ -110,11 +110,21 @@ def cargar_datos():
         print(f"Se produjo un error al leer el archivo: {e}")
         return None
 
+
+
+
 def salir():
     print("Saliendo del programa.")
     exit()
 
+def clear():
+    if os.name == 'posix':
+        _ = os.system('clear')
+    elif os.name == 'nt':
+        _ = os.system('cls')
+
 def menu(arbol):
+    clear()
     while True:
         print("1. Imprimir Recorrido Inorden")
         print("2. Imprimir Recorrido Preorden")
@@ -125,6 +135,7 @@ def menu(arbol):
         opcion = input("Selecciona una opción: ")
         
         if opcion == "1":
+            clear()
             print("Recorrido Inorden:")
             inicio = time.time()
             arbol.inorden(arbol.raiz)
@@ -132,6 +143,7 @@ def menu(arbol):
             tiempo_total = fin - inicio
             print(f"\nTiempo que tardo en ejecutar el recorrido: {tiempo_total:.5f} segundos")
         elif opcion == "2":
+            clear()
             print("\nRecorrido Preorden:")
             inicio = time.time()
             arbol.preorden(arbol.raiz)
@@ -139,6 +151,7 @@ def menu(arbol):
             tiempo_total = fin - inicio
             print(f"\nTiempo que tardo en ejecutar el recorrido: {tiempo_total:.5f} segundos")
         elif opcion == "3":
+            clear()
             print("\nRecorrido Postorden:")
             inicio = time.time()
             arbol.postorden(arbol.raiz)
@@ -146,6 +159,7 @@ def menu(arbol):
             tiempo_total = fin - inicio
             print(f"\nTiempo que tardo en ejecutar el recorrido: {tiempo_total:.5f} segundos")
         elif opcion == "4":
+            clear()
             dato = input("Ingresa el apellido a buscar por (DFS): ")
             inicio = time.time()
             resultado = arbol.buscar_dfs(dato.capitalize())
@@ -157,6 +171,7 @@ def menu(arbol):
             tiempo_total = fin - inicio
             print(f"\nTiempo que tardo en ejecutar la busqueda: {tiempo_total:.5f} segundos")
         elif opcion == "5":
+            clear()
             dato = input("Ingrese el apellido a buscar (BFS): ")
             inicio = time.time()
             resultado = arbol.buscar_bfs(dato.capitalize())
@@ -168,6 +183,8 @@ def menu(arbol):
             tiempo_total = fin - inicio
             print(f"\nTiempo que tardo en ejecutar la búsqueda: {tiempo_total:.5f} segundos")
         elif opcion == "6":
+            clear()
+            print("Saliendo del sistema...")
             salir()
         else:
             print("Opción inválida. Inténtalo de nuevo.")
