@@ -370,3 +370,5 @@ while True:
     else:
         clear()  # Limpiar la consola
         print("Opción no válida")  # Imprimir mensaje de opción no válida
+    
+    
