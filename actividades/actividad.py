@@ -76,33 +76,43 @@ class Arbol:
             if nodo.derecha is not None:
                 cola.append(nodo.derecha)
         return None
+    
+    def altura(self,nodo):
+        if nodo is None:
+            return 0
+        altura_izquierda = self.altura(nodo.izquierda)
+        altura_derecha = self.altura(nodo.derecha)
+        return max(altura_izquierda, altura_derecha) + 1
+    
+    def peso(self,nodo):
+        if nodo is None:
+            return  0
+        return self.peso(nodo.izquierda) + self.peso(nodo.derecha) + 1
 
 def cargar_datos():
     arbol = Arbol()
     
-    # Verificar el directorio actual de trabajo
     current_directory = os.getcwd()
     print(f"Directorio actual: {current_directory}")
 
-    # Ruta relativa al archivo CSV en el mismo directorio que el script
     relative_file_path = 'actividades/MOCK_DATA.csv'
 
-    # Verificar si el archivo existe usando la ruta relativa
     if os.path.exists(relative_file_path):
         file_path = relative_file_path
     else:
-        # Ruta absoluta al archivo CSV
         file_path = os.path.join(current_directory, 'actividades', 'MOCK_DATA.csv')
         if not os.path.exists(file_path):
             print(f"El archivo {file_path} no existe.")
             return None
 
-    # Leer y cargar datos del archivo CSV
     try:
         with open(file_path, mode='r', encoding='utf-8', newline='') as archivo:
             lector_csv = csv.reader(archivo)
             next(lector_csv)  # Saltar la cabecera
-            for fila in lector_csv:
+            for i, fila in enumerate(lector_csv):
+                if len(fila) < 2:
+                    print(f"Fila {i} está incompleta: {fila}")
+                    continue
                 apellido = fila[1]
                 arbol.agregar(apellido)
         return arbol
@@ -110,7 +120,34 @@ def cargar_datos():
         print(f"Se produjo un error al leer el archivo: {e}")
         return None
 
+def agregar_persona_manual(arbol,file_path):
+    firts_name = input("Nombre de la persona: ")
+    last_name = input(f"Apellido de {firts_name}: ")
+    while True:
+        flag_genero = int(input("Elegi el Genero Pibe\n[1]Male [2]Female\nOpcion:"))
+        if flag_genero == 1:
+            genero = "Male"
+            break
+        elif flag_genero == 2:
+            genero = "Female"
+            break
+        else:
+            print("Gennero Invalido, intente nuevamente...")
+        
+    ciudad = input(f"Ciudad de {firts_name}: ")
+    pais = input(f"País de {firts_name}: ")
 
+    #Agregar al arbol 
+    arbol.agregar(last_name.capitalize())
+
+    #Agregar al csv
+    try:
+        with open(file_path, mode="a",encoding="utf-8",newline="") as archivo:
+            escritor_csv = csv.writer(archivo)
+            escritor_csv.writerow([firts_name,last_name,genero,ciudad,pais])
+        print(f"""Persona Agregada Con Exito\n-------------------------- \nNombre:{firts_name}\nApellido:{last_name}\nGenero:{genero}\nCiudad:{ciudad}\nPais:{pais}\n\n\n""")
+    except Exception as e:
+        print(f"Se Produjo un error al escribir en el archivo CSV: {e}")
 
 
 def salir():
@@ -123,7 +160,7 @@ def clear():
     elif os.name == 'nt':
         _ = os.system('cls')
 
-def menu(arbol):
+def menu(arbol,file_path):
     clear()
     while True:
         print("1. Imprimir Recorrido Inorden")
@@ -131,7 +168,10 @@ def menu(arbol):
         print("3. Imprimir Recorrido Postorden")
         print("4. Buscar Persona por (DFS)")
         print("5. Buscar Persona por (BFS)")
-        print("6. Salir")
+        print("6. Insetar Persona manualmente ")
+        print("7. Imprimir Altura del Arbol")
+        print("8. Imprimir Peso del Arbol")
+        print("9. Salir")
         opcion = input("Selecciona una opción: ")
         
         if opcion == "1":
@@ -141,7 +181,7 @@ def menu(arbol):
             arbol.inorden(arbol.raiz)
             fin = time.time()
             tiempo_total = fin - inicio
-            print(f"\nTiempo que tardo en ejecutar el recorrido: {tiempo_total:.5f} segundos")
+            print(f"\nTiempo que tardo en ejecutar el recorrido: {tiempo_total:.5f} segundos\n\n")
         elif opcion == "2":
             clear()
             print("\nRecorrido Preorden:")
@@ -149,7 +189,7 @@ def menu(arbol):
             arbol.preorden(arbol.raiz)
             fin = time.time()
             tiempo_total = fin - inicio
-            print(f"\nTiempo que tardo en ejecutar el recorrido: {tiempo_total:.5f} segundos")
+            print(f"\nTiempo que tardo en ejecutar el recorrido: {tiempo_total:.5f} segundos\n\n")
         elif opcion == "3":
             clear()
             print("\nRecorrido Postorden:")
@@ -157,7 +197,7 @@ def menu(arbol):
             arbol.postorden(arbol.raiz)
             fin = time.time()
             tiempo_total = fin - inicio
-            print(f"\nTiempo que tardo en ejecutar el recorrido: {tiempo_total:.5f} segundos")
+            print(f"\nTiempo que tardo en ejecutar el recorrido: {tiempo_total:.5f} segundos\n\n")
         elif opcion == "4":
             clear()
             dato = input("Ingresa el apellido a buscar por (DFS): ")
@@ -169,7 +209,7 @@ def menu(arbol):
             else:
                 print("Persona no encontrada")
             tiempo_total = fin - inicio
-            print(f"\nTiempo que tardo en ejecutar la busqueda: {tiempo_total:.5f} segundos")
+            print(f"\nTiempo que tardo en ejecutar la busqueda: {tiempo_total:.5f} segundos\n\n")
         elif opcion == "5":
             clear()
             dato = input("Ingrese el apellido a buscar (BFS): ")
@@ -181,17 +221,38 @@ def menu(arbol):
             else:
                 print("Persona no encontrada")
             tiempo_total = fin - inicio
-            print(f"\nTiempo que tardo en ejecutar la búsqueda: {tiempo_total:.5f} segundos")
+            print(f"\nTiempo que tardo en ejecutar la búsqueda: {tiempo_total:.5f} segundos\n\n")
         elif opcion == "6":
+            clear()
+            agregar_persona_manual(arbol,file_path)
+        elif opcion == "7":
+            clear()
+            inicio = time.time()
+            altura = arbol.altura(arbol.raiz)
+            fin = time.time()
+            print(f"la altura del arbol es de: {altura}")
+            tiempo_total = fin - inicio
+            print(f"\nTiempo que tardo en calcular la altura del arbol es de: {tiempo_total:.5f}\n\n")
+        elif opcion == "8":
+            clear()
+            inicio = time.time()
+            peso = arbol.peso(arbol.raiz)
+            fin= time.time()
+            print(f"El peso del arbol es de: {peso}")
+            tiempo_total = fin - inicio
+            print(f"\nTiempo que tardo en calcular el peso del arbol es de: {tiempo_total:.5f}\n\n")
+        elif opcion == "9":
             clear()
             print("Saliendo del sistema...")
             salir()
         else:
             print("Opción inválida. Inténtalo de nuevo.")
 
-# Cargar datos y ejecutar el menú
-arbol = cargar_datos()
-if arbol is not None:
-    menu(arbol)
-else:
-    print("No se pudieron cargar los datos del archivo CSV.")
+# Cargar datos del repositorio y ejecutar el menú
+if __name__ == "__main__":
+    arbol = cargar_datos()
+    if arbol is not None:
+        file_path = os.path.join(os.getcwd(),"actividades","MOCK_DATA.csv")
+        menu(arbol,file_path)
+    else:
+        print("No se pudieron cargar los archivos csv")
