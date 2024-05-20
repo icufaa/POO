@@ -95,7 +95,7 @@ def cargar_datos():
     current_directory = os.getcwd()
     print(f"Directorio actual: {current_directory}")
 
-    relative_file_path = 'actividades/MOCK_DATA.csv'
+    relative_file_path = 'MOCK_DATA.csv'
 
     if os.path.exists(relative_file_path):
         file_path = relative_file_path
