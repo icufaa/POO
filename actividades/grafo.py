@@ -1,3 +1,9 @@
+"""
+Viñales Facundo
+Meyer Ivan 
+Escallier Alejandro
+"""
+
 import queue  # Importa el módulo queue para usar la cola de prioridad en el algoritmo de Dijkstra
 
 class Nodo:
